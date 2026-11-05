@@ -1,0 +1,152 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/vochikhanh/app-promo-video/schema/script.schema.json",
+  "title": "Promo video script",
+  "description": "One video: a language, a color theme, a music style and an ordered list of scenes. Scene length follows the voice-over; you never set timings by hand. Full reference: docs/script-format.md",
+  "type": "object",
+  "required": ["scenes"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "lang": { "type": "string", "description": "Language code; must have a block in ads.json › lang. Screens are looked up as screens/<lang>-<clip>.* first, then screens/<clip>.*", "examples": ["en", "vi", "es"] },
+    "theme": { "type": "string", "description": "Key of ads.json › themes (background gradient, glow and highlight colors). Default: the first theme." },
+    "colors": { "$ref": "#/$defs/theme", "description": "Per-video color overrides on top of the theme." },
+    "music": { "enum": ["bright", "warm", "playful", "none"], "default": "bright", "description": "Synthesized background music style." },
+    "tail": { "type": "number", "minimum": 0, "description": "Seconds of breathing room after each spoken line (default: ads.json › tail, else 0.2)." },
+    "badges": { "type": "array", "items": { "type": "string" }, "description": "Store pills on the end card (default: ads.json › badges)." },
+    "captions": { "type": "boolean", "default": true, "description": "false = no burned-in captions (the .vtt is still written)." },
+    "brand": { "type": "boolean", "default": true, "description": "false = hide the small app icon + name in the corner." },
+    "sfx": { "type": "boolean", "default": true, "description": "false = no whoosh / pop / ding sound effects." },
+    "angle": { "type": "string", "description": "Free text: the idea of this video. Ignored by the engine; useful for humans and agents." },
+    "scenes": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/scene" } }
+  },
+  "$defs": {
+    "theme": {
+      "type": "object",
+      "properties": {
+        "c1": { "type": "string", "description": "Gradient start (top-left) and accent color." },
+        "c2": { "type": "string", "description": "Gradient end (bottom-right)." },
+        "glow": { "type": "string", "description": "Soft moving blob in the background." },
+        "hl": { "type": "string", "description": "Highlight color for *starred* words." }
+      }
+    },
+    "common": {
+      "type": "object",
+      "properties": {
+        "type": { "enum": ["chat", "text", "phone", "trio", "end"] },
+        "say": { "type": "string", "description": "Voice-over line, about 8-15 words. Scene length = spoken length + tail." },
+        "cap": { "type": "string", "description": "Caption text when it should differ from `say` (same number of words reads best)." },
+        "big": { "type": "string", "description": "Headline. *stars* highlight words, \\n breaks lines. Max 2 lines of ~18 characters." },
+        "sub": { "type": "string", "description": "Smaller line under the headline." },
+        "min": { "type": "number", "description": "Minimum scene length in seconds (default 1.6)." },
+        "hold": { "type": "number", "description": "Extra seconds after the line (e.g. 1.0 on the end card)." },
+        "duration": { "type": "number", "description": "Fixed length, only for scenes without `say`." },
+        "still": { "type": "number", "description": "Second within the scene used by `stills` (default 80% of the scene)." },
+        "confetti": { "type": "number", "description": "Burst confetti (with a ding) at this second of the scene." },
+        "mood": { "type": "string", "description": "Optional emotion tag for this line, e.g. \"excited\". Use sparingly: per-line tags often make the voice jumpy." }
+      }
+    },
+    "chip": {
+      "type": "object",
+      "required": ["text"],
+      "properties": {
+        "text": { "type": "string", "description": "Short benefit, 2-4 words." },
+        "icon": { "type": "string", "description": "Optional emoji or symbol; a colored dot when omitted." },
+        "at": { "type": "number", "description": "Second it pops in (default 0.6 + 0.35 × index)." },
+        "pos": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2, "description": "[x, y] pixels; overrides the default slot for every aspect." }
+      }
+    },
+    "scene": {
+      "allOf": [{ "$ref": "#/$defs/common" }],
+      "required": ["type"],
+      "oneOf": [
+        {
+          "title": "chat: group-chat hook",
+          "properties": {
+            "type": { "const": "chat" },
+            "gap": { "type": "number", "description": "Seconds between messages (default 0.32)." },
+            "shakeAt": { "type": "number", "description": "Second when the chat card shakes (the 'chaos' beat)." },
+            "chat": {
+              "type": "object",
+              "required": ["title", "msgs"],
+              "properties": {
+                "title": { "type": "string" },
+                "subtitle": { "type": "string" },
+                "badge": { "type": "string", "description": "Group avatar text or emoji (default: first letter of the title)." },
+                "color": { "type": "string" },
+                "msgs": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "who": { "type": "string" },
+                      "text": { "type": "string" },
+                      "me": { "type": "boolean", "description": "Right-aligned bubble in the theme color." },
+                      "color": { "type": "string", "description": "Avatar color." },
+                      "emoji": { "type": "string", "description": "A big emoji instead of a text bubble." },
+                      "at": { "type": "number", "description": "Exact second this message appears." }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "required": ["type", "chat"]
+        },
+        {
+          "title": "text: kinetic statement, no device",
+          "properties": { "type": { "const": "text" } },
+          "required": ["type", "big"]
+        },
+        {
+          "title": "phone: screenshot or recording in a phone (or a card)",
+          "properties": {
+            "type": { "const": "phone" },
+            "clip": { "type": "string", "description": "Media name in screens/ without extension or language prefix." },
+            "clips": {
+              "type": "array",
+              "description": "Several media in one scene, split evenly, each with an optional label.",
+              "items": { "type": "object", "required": ["clip"], "properties": { "clip": { "type": "string" }, "label": { "type": "string" }, "from": { "type": "number" }, "rate": { "type": "number" } } }
+            },
+            "from": { "type": "number", "description": "Recordings only: start second (when the screen has finished loading)." },
+            "rate": { "type": "number", "description": "Recordings only: playback speed (default 1)." },
+            "device": { "enum": ["phone", "card"], "default": "phone", "description": "card = a 4:5 rounded card without a bezel, for product photos." },
+            "fit": { "enum": ["cover", "contain"], "default": "cover" },
+            "zoom": {
+              "type": "object",
+              "required": ["s", "x", "y"],
+              "description": "Magnify the screen around a point: s = scale (1.2-1.5), x/y = 0..1 focus point, at = start second (default 0.8).",
+              "properties": { "s": { "type": "number" }, "x": { "type": "number", "minimum": 0, "maximum": 1 }, "y": { "type": "number", "minimum": 0, "maximum": 1 }, "at": { "type": "number" } }
+            },
+            "tilt": { "type": "number", "description": "Resting rotation of the device in degrees." },
+            "chips": { "type": "array", "maxItems": 4, "items": { "$ref": "#/$defs/chip" } }
+          },
+          "anyOf": [{ "required": ["clip"] }, { "required": ["clips"] }]
+        },
+        {
+          "title": "trio: feature tiles",
+          "properties": {
+            "type": { "const": "trio" },
+            "items": {
+              "type": "array", "maxItems": 4,
+              "description": "Tiles for this scene (default: ads.json › lang.<lang>.features).",
+              "items": { "type": "object", "required": ["name"], "properties": { "name": { "type": "string" }, "desc": { "type": "string" }, "color": { "type": "string" }, "icon": { "type": "string", "description": "Path relative to the project (white glyph SVG/PNG looks best)." } } }
+            }
+          },
+          "required": ["type"]
+        },
+        {
+          "title": "end: call to action",
+          "properties": {
+            "type": { "const": "end" },
+            "title": { "type": "string", "description": "Default: ads.json › appName." },
+            "tag": { "type": "string", "description": "One-line promise under the name." },
+            "cta": { "type": "string", "description": "Button text, e.g. \"Download free\"." },
+            "url": { "type": "string", "description": "Default: ads.json › url. Empty string hides it." },
+            "badges": { "type": "array", "items": { "type": "string" } }
+          },
+          "required": ["type"]
+        }
+      ]
+    }
+  }
+}

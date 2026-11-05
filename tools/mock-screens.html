@@ -1,0 +1,172 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<!-- Mock app screens for the starter template (a fictional plant-care app, "Pocket Garden").
+     Rendered by tools/make-mocks.mjs at 1080×2400: ?screen=today|scan|reminders|care|streak&lang=en|vi
+     Everything is drawn with HTML/CSS/SVG: no photos, no third-party artwork. -->
+<style>
+@font-face { font-family: BVP; src: url(../fonts/BeVietnamPro-Medium.ttf); font-weight: 500; }
+@font-face { font-family: BVP; src: url(../fonts/BeVietnamPro-SemiBold.ttf); font-weight: 600; }
+@font-face { font-family: BVP; src: url(../fonts/BeVietnamPro-Bold.ttf); font-weight: 700; }
+@font-face { font-family: BVP; src: url(../fonts/BeVietnamPro-ExtraBold.ttf); font-weight: 800; }
+:root { --g: #2E9E5B; --g2: #1F7A45; --gl: #E3F4E9; --ink: #1F2A24; --mut: #6B7A70; --bg: #F4F7F2; --water: #3B82F6; --sun: #F5A524; --pink: #EC6A8C; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { width: 1080px; height: 2400px; overflow: hidden; font-family: BVP, sans-serif; background: var(--bg); color: var(--ink); position: relative; }
+.status { height: 150px; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 70px 24px; font-weight: 700; font-size: 44px; }
+.status .ic { display: flex; gap: 14px; align-items: center; }
+.status .ic i { display: block; background: currentColor; border-radius: 6px; }
+.wrap { padding: 30px 60px; }
+h1 { font-size: 96px; font-weight: 800; letter-spacing: -2px; }
+.date { font-size: 42px; color: var(--mut); font-weight: 600; margin-top: 6px; }
+.card { background: #fff; border-radius: 56px; box-shadow: 0 10px 40px rgba(31,42,36,.07); }
+.row { display: flex; align-items: center; }
+.tabbar { position: absolute; left: 0; right: 0; bottom: 0; height: 230px; background: #fff; border-top: 2px solid #E6ECE7; display: flex; justify-content: space-around; padding-top: 34px; }
+.tabbar div { display: flex; flex-direction: column; align-items: center; gap: 10px; font-size: 30px; font-weight: 600; color: #9AA79F; }
+.tabbar div.on { color: var(--g); }
+.tabbar span { width: 64px; height: 64px; border-radius: 20px; background: currentColor; opacity: .9; }
+.pill { white-space: nowrap; display: inline-flex; align-items: center; gap: 12px; padding: 12px 26px; border-radius: 999px; font-weight: 700; font-size: 34px; }
+.avatar { width: 150px; height: 150px; border-radius: 44px; display: grid; place-items: center; flex: none; }
+.check { width: 84px; height: 84px; border-radius: 50%; border: 6px solid #D3DDD6; flex: none; display: grid; place-items: center; }
+.check.on { background: var(--g); border-color: var(--g); }
+.check.on::after { content: ''; width: 34px; height: 18px; border-left: 8px solid #fff; border-bottom: 8px solid #fff; transform: translateY(-5px) rotate(-45deg); }
+.btn { background: var(--g); color: #fff; border-radius: 999px; text-align: center; font-weight: 800; font-size: 46px; padding: 40px; }
+.meter { height: 34px; border-radius: 999px; background: #EAF0EC; overflow: hidden; margin-top: 18px; }
+.meter i { display: block; height: 100%; border-radius: 999px; }
+</style>
+</head>
+<body>
+<div class="status"><span>9:41</span><span class="ic"><i style="width:44px;height:26px"></i><i style="width:40px;height:30px;border-radius:50% 50% 6px 6px"></i><i style="width:70px;height:34px;border-radius:10px"></i></span></div>
+<div id="app"></div>
+<script>
+const q = new URLSearchParams(location.search)
+const screen = q.get('screen') || 'today', lang = q.get('lang') || 'en'
+const T = {
+  en: {
+    today: 'Today', date: 'Tuesday, May 12', done: 'of 5 plants cared for', shared: 'Shared with Mia & Leo',
+    plants: [['Boston Fern', 'Water · 250 ml', 'Living room', 1], ['Monstera', 'Mist leaves', 'Bedroom', 1], ['Snake Plant', 'Rotate pot', 'Hallway', 1], ['Calathea', 'Water · 200 ml', 'Kitchen', 0], ['Pothos', 'Wipe leaves', 'Office', 0]],
+    scanning: 'Identifying…', match: '98% match', species: 'Monstera deliciosa', common: 'Swiss cheese plant',
+    every: 'Every 7 days', light: 'Bright, indirect', hum: 'Humidity 60%', add: 'Add to my garden',
+    rem: 'Reminders', days: ['M', 'T', 'W', 'T', 'F', 'S', 'S'], notifApp: 'POCKET GARDEN · now', notif: 'The fern\'s soil is dry. Time for a drink!',
+    rems: [['8:00', 'Water the Boston Fern', 'Soil moisture low', 'water'], ['12:30', 'Mist the Monstera', 'Dry air today', 'g'], ['18:00', 'Turn the Snake Plant', 'Even sunlight', 'sun']],
+    care: 'Boston Fern', room: 'Living room · 2 years', lightL: 'Light', waterL: 'Water', humL: 'Humidity', tipT: 'Tip of the day', tip: 'Ferns love a morning mist. Keep them away from heaters and they will stay lush.',
+    streak: 'day streak', week: 'This week', keep: 'Keep it growing!', badges: [['First sprout', 'g'], ['Green thumb', 'sun'], ['Jungle keeper', 'pink']],
+    tabs: ['Today', 'Scan', 'Garden', 'Me'],
+  },
+  vi: {
+    today: 'Hôm nay', date: 'Thứ Ba, 12 tháng 5', done: 'trên 5 cây đã chăm', shared: 'Chia sẻ với Mai và Long',
+    plants: [['Dương xỉ', 'Tưới · 250 ml', 'Phòng khách', 1], ['Trầu bà lá xẻ', 'Phun sương lá', 'Phòng ngủ', 1], ['Lưỡi hổ', 'Xoay chậu', 'Hành lang', 1], ['Đuôi công', 'Tưới · 200 ml', 'Nhà bếp', 0], ['Trầu bà', 'Lau lá', 'Văn phòng', 0]],
+    scanning: 'Đang nhận diện…', match: 'Khớp 98%', species: 'Monstera deliciosa', common: 'Trầu bà lá xẻ',
+    every: '7 ngày một lần', light: 'Sáng, gián tiếp', hum: 'Độ ẩm 60%', add: 'Thêm vào vườn',
+    rem: 'Lời nhắc', days: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'], notifApp: 'POCKET GARDEN · bây giờ', notif: 'Đất của cây dương xỉ đã khô. Tưới nước thôi!',
+    rems: [['8:00', 'Tưới cây dương xỉ', 'Đất đang khô', 'water'], ['12:30', 'Phun sương trầu bà', 'Hôm nay trời hanh', 'g'], ['18:00', 'Xoay chậu lưỡi hổ', 'Cho cây đều nắng', 'sun']],
+    care: 'Dương xỉ', room: 'Phòng khách · 2 năm', lightL: 'Ánh sáng', waterL: 'Nước', humL: 'Độ ẩm', tipT: 'Mẹo hôm nay', tip: 'Dương xỉ thích được phun sương buổi sáng. Để xa máy sưởi, lá sẽ luôn xanh mướt.',
+    streak: 'ngày liên tiếp', week: 'Tuần này', keep: 'Cố lên, vườn đang lớn!', badges: [['Mầm đầu tiên', 'g'], ['Tay xanh', 'sun'], ['Chủ rừng nhỏ', 'pink']],
+    tabs: ['Hôm nay', 'Quét', 'Vườn', 'Tôi'],
+  },
+}[lang]
+const C = { g: '#2E9E5B', water: '#3B82F6', sun: '#F5A524', pink: '#EC6A8C' }
+const TINT = ['#E3F4E9', '#E6F0FF', '#FFF3DC', '#FDE7EE', '#EDE9FE']
+const HUE = ['#2E9E5B', '#3B82F6', '#C98A12', '#D9486F', '#7C5CE0']
+
+// simple plant illustrations (pot + leaves), drawn as SVG
+function plant(kind, size, hue = '#2E9E5B') {
+  const leaf = (x, y, r, s = 1) => `<path transform="translate(${x} ${y}) rotate(${r}) scale(${s})" d="M0 0 C 18 -30 18 -70 0 -100 C -18 -70 -18 -30 0 0Z" fill="${hue}"/>`
+  const leaves = kind % 3 === 0
+    ? [leaf(60, 78, -55), leaf(60, 78, -25, 1.1), leaf(60, 78, 0, 1.2), leaf(60, 78, 25, 1.1), leaf(60, 78, 55)].join('')
+    : kind % 3 === 1
+      ? `<circle cx="42" cy="38" r="26" fill="${hue}"/><circle cx="78" cy="34" r="24" fill="${hue}" opacity=".85"/><circle cx="60" cy="16" r="20" fill="${hue}" opacity=".9"/><rect x="57" y="38" width="6" height="40" fill="${hue}"/>`
+      : [leaf(48, 80, -12, 1.25), leaf(60, 80, 0, 1.4), leaf(72, 80, 12, 1.2)].join('')
+  return `<svg width="${size}" height="${size}" viewBox="0 0 120 120">${leaves}<path d="M30 78 H90 L82 112 H38Z" fill="#C8754A"/><rect x="26" y="72" width="68" height="12" rx="6" fill="#B5643B"/></svg>`
+}
+function monstera(size) {
+  // heart-shaped split leaf: body, midrib, veins, and the characteristic slits
+  const slits = [[-1, 70, 30], [-1, 100, 22], [-1, 130, 14], [1, 70, 30], [1, 100, 22], [1, 130, 14]]
+    .map(([d, y, len]) => `<path d="M${100 + d * 92} ${y - 6} L${100 + d * (92 - len - 30)} ${y + 6}" stroke="#244A33" stroke-width="10" stroke-linecap="round"/>`).join('')
+  return `<svg width="${size}" height="${size}" viewBox="0 0 200 200">
+  <defs><clipPath id="leafclip"><path d="M100 168 C 40 140 4 100 14 60 C 24 18 78 6 100 40 C 122 6 176 18 186 60 C 196 100 160 140 100 168Z"/></clipPath></defs>
+  <path d="M100 196 C 98 180 99 172 100 166" stroke="#1F7A45" stroke-width="8" fill="none"/>
+  <path d="M100 168 C 40 140 4 100 14 60 C 24 18 78 6 100 40 C 122 6 176 18 186 60 C 196 100 160 140 100 168Z" fill="#2E9E5B"/>
+  <path d="M100 166 L100 44" stroke="#1F7A45" stroke-width="6"/>
+  ${[60, 90, 120].map(y => `<path d="M100 ${y + 24} Q ${70} ${y + 4} 40 ${y - 4} M100 ${y + 24} Q 130 ${y + 4} 160 ${y - 4}" stroke="#1F7A45" stroke-width="4" fill="none"/>`).join('')}
+  <g clip-path="url(#leafclip)">${slits}</g></svg>`
+}
+const tabs = on => `<div class="tabbar">${T.tabs.map((t, i) => `<div class="${i === on ? 'on' : ''}"><span></span>${t}</div>`).join('')}</div>`
+const app = document.getElementById('app')
+
+if (screen === 'today') {
+  const done = T.plants.filter(p => p[3]).length
+  app.innerHTML = `<div class="wrap"><h1>${T.today}</h1><div class="date">${T.date}</div>
+  <div class="card row" style="margin-top:50px;padding:50px;gap:50px;background:linear-gradient(135deg,#2E9E5B,#1F7A45);color:#fff">
+    <svg width="230" height="230" viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" stroke="rgba(255,255,255,.25)" stroke-width="12" fill="none"/>
+    <circle cx="50" cy="50" r="42" stroke="#fff" stroke-width="12" fill="none" stroke-linecap="round" stroke-dasharray="${264 * done / 5} 264" transform="rotate(-90 50 50)"/>
+    <text x="50" y="60" text-anchor="middle" font-size="30" font-weight="800" fill="#fff" font-family="BVP">${done}/5</text></svg>
+    <div><div style="font-size:62px;font-weight:800;line-height:1.1">${done} ${T.done}</div>
+    <div class="row" style="gap:0;margin-top:26px">${['#F5A524', '#EC6A8C', '#7AC7FF'].map((c, i) => `<span style="width:76px;height:76px;border-radius:50%;background:${c};border:5px solid #2A8C51;margin-left:${i ? -18 : 0}px;display:grid;place-items:center;font-weight:800;font-size:34px">${['M', 'L', '+'][i]}</span>`).join('')}
+    <span style="margin-left:22px;font-size:36px;font-weight:600;opacity:.9">${T.shared}</span></div></div></div>
+  ${T.plants.map((p, i) => `<div class="card row" style="margin-top:34px;padding:34px 44px;gap:40px">
+    <div class="avatar" style="background:${TINT[i]}">${plant(i, 120, HUE[i])}</div>
+    <div style="flex:1"><div style="font-size:52px;font-weight:800">${p[0]}</div>
+    <div class="row" style="gap:20px;margin-top:12px"><span class="pill" style="background:${TINT[i]};color:${HUE[i]}">${p[1]}</span><span style="font-size:34px;color:var(--mut);font-weight:600">${p[2]}</span></div></div>
+    <div class="check${p[3] ? ' on' : ''}"></div></div>`).join('')}</div>${tabs(0)}`
+}
+
+if (screen === 'scan') {
+  document.body.style.background = '#0F1A14'
+  document.querySelector('.status').style.color = '#fff'
+  app.innerHTML = `<div style="position:absolute;left:0;right:0;top:150px;height:1500px;background:radial-gradient(ellipse at 50% 45%,#3E6B4F 0%,#1B3325 55%,#0F1A14 100%)"></div>
+  <div style="position:absolute;left:140px;top:330px;width:800px;height:900px">
+    ${[[0, 0, 0], [1, 0, 90], [1, 1, 180], [0, 1, 270]].map(([x, y, r]) => `<div style="position:absolute;${x ? 'right' : 'left'}:0;${y ? 'bottom' : 'top'}:0;width:120px;height:120px;border-left:12px solid #fff;border-top:12px solid #fff;border-radius:30px 0 0 0;transform:rotate(${r}deg)"></div>`).join('')}
+    <div style="position:absolute;left:100px;top:120px">${monstera(600)}</div>
+    <div style="position:absolute;left:60px;right:60px;top:520px;height:8px;border-radius:4px;background:linear-gradient(90deg,transparent,#7CF0A8,transparent);box-shadow:0 0 30px #7CF0A8"></div></div>
+  <div class="pill" style="position:absolute;left:50%;transform:translateX(-50%);top:1300px;background:rgba(255,255,255,.16);color:#fff;font-size:40px;padding:18px 40px">${T.scanning}</div>
+  <div style="position:absolute;left:0;right:0;bottom:0;height:900px;background:#fff;border-radius:70px 70px 0 0;padding:44px 70px">
+    <div style="width:140px;height:14px;border-radius:7px;background:#DCE3DE;margin:0 auto 46px"></div>
+    <div class="row" style="justify-content:space-between"><div><div style="font-size:70px;font-weight:800;letter-spacing:-1px">${T.species}</div><div style="font-size:42px;color:var(--mut);font-weight:600;margin-top:6px">${T.common}</div></div>
+    <span class="pill" style="background:var(--gl);color:var(--g2);font-size:40px">${T.match}</span></div>
+    <div class="row" style="gap:28px;margin-top:56px">${[[T.every, C.water, '#E6F0FF'], [T.light, '#C98A12', '#FFF3DC'], [T.hum, C.g, '#E3F4E9']].map(([t, c, b]) => `<div style="flex:1;background:${b};border-radius:40px;padding:36px 28px"><div style="width:70px;height:70px;border-radius:50%;background:${c}"></div><div style="font-size:38px;font-weight:700;margin-top:22px;color:${c === C.g ? '#1F7A45' : c}">${t}</div></div>`).join('')}</div>
+    <div class="btn" style="margin-top:60px">${T.add}</div></div>`
+}
+
+if (screen === 'reminders') {
+  app.innerHTML = `<div class="wrap"><h1>${T.rem}</h1>
+  <div class="card" style="margin-top:46px;padding:40px 46px;display:flex;gap:30px;align-items:center;box-shadow:0 24px 60px rgba(31,42,36,.16)">
+    <div style="width:120px;height:120px;border-radius:34px;background:var(--g);display:grid;place-items:center;flex:none">${plant(2, 96, '#fff').replace('#C8754A', '#E9F7EE').replace('#B5643B', '#CFEAD9')}</div>
+    <div><div style="font-size:32px;font-weight:700;color:var(--mut);letter-spacing:1px">${T.notifApp}</div><div style="font-size:46px;font-weight:700;margin-top:8px;line-height:1.25">${T.notif}</div></div></div>
+  <div class="card row" style="margin-top:46px;padding:40px 30px;justify-content:space-between">${T.days.map((d, i) => `<div style="display:flex;flex-direction:column;align-items:center;gap:18px;width:118px;padding:20px 0;border-radius:36px;${i === 1 ? 'background:var(--g);color:#fff' : ''}">
+    <span style="font-size:34px;font-weight:700;${i === 1 ? '' : 'color:var(--mut)'}">${d}</span><span style="font-size:52px;font-weight:800">${11 + i}</span>
+    <span style="width:26px;height:26px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:${i === 1 ? '#fff' : [0, 3, 5].includes(i) ? C.water : 'transparent'}"></span></div>`).join('')}</div>
+  ${T.rems.map(([t, a, b, c], i) => `<div class="card row" style="margin-top:34px;padding:44px;gap:40px">
+    <div style="font-size:50px;font-weight:800;width:170px;color:${C[c]}">${t}</div>
+    <div style="flex:1;border-left:6px solid ${C[c]};padding-left:36px"><div style="font-size:50px;font-weight:800">${a}</div><div style="font-size:38px;color:var(--mut);font-weight:600;margin-top:8px">${b}</div></div>
+    <div style="width:110px;height:64px;border-radius:999px;background:${i < 2 ? C.g : '#D3DDD6'};position:relative"><span style="position:absolute;top:7px;${i < 2 ? 'right' : 'left'}:7px;width:50px;height:50px;border-radius:50%;background:#fff"></span></div></div>`).join('')}
+  </div>${tabs(2)}`
+}
+
+if (screen === 'care') {
+  app.innerHTML = `<div style="height:820px;margin:0 40px;border-radius:70px;background:linear-gradient(160deg,#DFF3E6,#B9E4C9);display:grid;place-items:center;position:relative">
+    ${plant(0, 640, '#2E9E5B')}
+    <span class="pill" style="position:absolute;left:44px;top:44px;background:#fff;color:var(--g2)">${T.room}</span></div>
+  <div class="wrap"><h1 style="margin-top:20px">${T.care}</h1>
+  ${[[T.lightL, 70, C.sun], [T.waterL, 80, C.water], [T.humL, 65, C.g]].map(([l, v, c]) => `<div class="card" style="margin-top:34px;padding:40px 50px">
+    <div class="row" style="justify-content:space-between;font-size:46px;font-weight:800"><span>${l}</span><span style="color:${c}">${v}%</span></div>
+    <div class="meter"><i style="width:${v}%;background:${c}"></i></div></div>`).join('')}
+  <div class="card" style="margin-top:34px;padding:46px 50px;background:#FFF8E6">
+    <div style="font-size:38px;font-weight:800;color:#C98A12">${T.tipT}</div><div style="font-size:44px;font-weight:600;line-height:1.35;margin-top:14px">${T.tip}</div></div>
+  </div>${tabs(2)}`
+}
+
+if (screen === 'streak') {
+  const bars = [60, 85, 70, 100, 90, 75, 95]
+  app.innerHTML = `<div class="wrap" style="text-align:center">
+  <div style="margin:40px auto 0;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle,#FFF3C4 0%,#FFE08A 60%,#F5C451 100%);display:grid;place-items:center;box-shadow:0 30px 80px rgba(245,165,36,.35)">
+    <div><div style="font-size:220px;font-weight:800;line-height:1;color:#8A5A00;letter-spacing:-6px">21</div><div style="font-size:48px;font-weight:800;color:#8A5A00">${T.streak}</div></div></div>
+  <div style="font-size:64px;font-weight:800;margin-top:56px">${T.keep}</div>
+  <div class="card" style="margin-top:50px;padding:46px 50px;text-align:left"><div style="font-size:44px;font-weight:800">${T.week}</div>
+    <div class="row" style="align-items:flex-end;justify-content:space-between;height:380px;margin-top:30px">${bars.map((h, i) => `<div style="display:flex;flex-direction:column;align-items:center;gap:16px"><div style="width:86px;height:${h * 3}px;border-radius:26px;background:${i === 6 ? 'var(--g)' : '#BFE5CC'}"></div><span style="font-size:32px;font-weight:700;color:var(--mut)">${T.days[i]}</span></div>`).join('')}</div></div>
+  <div class="row" style="gap:30px;margin-top:40px">${T.badges.map(([b, c]) => `<div class="card" style="flex:1;padding:40px 20px"><div style="width:150px;height:150px;margin:0 auto;border-radius:50%;background:${C[c]};display:grid;place-items:center">${plant(1, 110, '#fff').replace('#C8754A', 'rgba(255,255,255,.75)').replace('#B5643B', 'rgba(255,255,255,.9)')}</div><div style="font-size:36px;font-weight:800;margin-top:24px">${b}</div></div>`).join('')}</div>
+  </div>${tabs(3)}`
+}
+</script>
+</body>
+</html>

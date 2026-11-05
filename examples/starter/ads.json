@@ -1,0 +1,54 @@
+{
+  "$schema": "../../schema/config.schema.json",
+  "appName": "Pocket Garden",
+  "url": "pocketgarden.example",
+  "icon": "assets/icon.svg",
+  "badges": ["App Store", "Google Play"],
+  "defaultLang": "en",
+  "aspects": ["9x16", "1x1", "16x9", "4x5"],
+  "speed": 1.05,
+  "tail": 0.16,
+  "musicVolume": 0.24,
+  "readingSpeed": 15,
+  "voice": {
+    "provider": "gemini",
+    "model": "gemini-3.1-flash-tts-preview",
+    "voice": "Leda",
+    "director": [
+      "# AUDIO PROFILE: Maya, 27, a cheerful {LANG} lifestyle creator with a bright, warm, smiling voice.",
+      "## THE SCENE: Recording the voice-over of a short, fun mobile app ad, talking to friends.",
+      "### DIRECTOR'S NOTES",
+      "Style: Friendly, upbeat and playful, smiling while speaking, natural conversational intonation, light emphasis on key words. Not salesy, never shouting, same energy from start to finish.",
+      "Pace: Fast and lively like a social media ad, yet smooth, no choppy breaks inside sentences. Leave a clear one-second pause between paragraphs.",
+      "Accent: Natural {LANG}.",
+      "#### TRANSCRIPT"
+    ]
+  },
+  "themes": {
+    "garden": { "c1": "#2FB36B", "c2": "#14614A", "glow": "#B8F27A", "hl": "#FFE27A" },
+    "sunset": { "c1": "#F5A524", "c2": "#C2410C", "glow": "#FFD08A", "hl": "#3A1C8C" },
+    "berry": { "c1": "#A472F2", "c2": "#4A3CCF", "glow": "#FF9AD5", "hl": "#FFE27A" }
+  },
+  "lang": {
+    "en": {
+      "accent": "American English",
+      "chunk": 4,
+      "lexicon": {},
+      "features": [
+        { "name": "Water plans", "desc": "Shared with the whole home", "color": "#3B82F6", "icon": "assets/water.svg" },
+        { "name": "Plant ID", "desc": "Snap a photo, get a care plan", "color": "#2E9E5B", "icon": "assets/scan.svg" },
+        { "name": "Care tips", "desc": "One small tip every day", "color": "#F5A524", "icon": "assets/tips.svg" }
+      ]
+    },
+    "vi": {
+      "accent": "Vietnamese",
+      "chunk": 4,
+      "lexicon": { "Pocket Garden": "Pốc-kịt Ga-đần" },
+      "features": [
+        { "name": "Lịch tưới", "desc": "Chia sẻ cho cả nhà", "color": "#3B82F6", "icon": "assets/water.svg" },
+        { "name": "Nhận diện cây", "desc": "Chụp ảnh, có ngay cách chăm", "color": "#2E9E5B", "icon": "assets/scan.svg" },
+        { "name": "Mẹo chăm cây", "desc": "Mỗi ngày một mẹo nhỏ", "color": "#F5A524", "icon": "assets/tips.svg" }
+      ]
+    }
+  }
+}

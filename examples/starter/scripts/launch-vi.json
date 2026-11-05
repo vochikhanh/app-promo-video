@@ -1,0 +1,68 @@
+{
+  "$schema": "../../../schema/script.schema.json",
+  "lang": "vi",
+  "theme": "garden",
+  "music": "bright",
+  "angle": "Bản tiếng Việt của launch-en.json: cùng cảnh, dịch say/big/chips; màn hình tự lấy screens/vi-*.png",
+  "scenes": [
+    {
+      "type": "chat",
+      "say": "Ba người ở chung, mười hai chậu cây, mà chẳng ai nhớ ai đã tưới cây nào.",
+      "big": "Ba người ở chung,\n*một cây khát nước*",
+      "gap": 0.42,
+      "shakeAt": 2.4,
+      "chat": {
+        "title": "Phòng 4B",
+        "subtitle": "3 thành viên",
+        "color": "#2E9E5B",
+        "msgs": [
+          { "who": "Mai", "color": "#EC6A8C", "text": "Có ai tưới cây dương xỉ chưa?" },
+          { "who": "Long", "color": "#3B82F6", "text": "Tưởng hôm qua bà tưới rồi" },
+          { "who": "Mai", "color": "#EC6A8C", "text": "Cây trầu bà lại héo nữa kìa" },
+          { "me": true, "text": "Thôi, phải có cách nào đó." }
+        ]
+      }
+    },
+    {
+      "type": "phone",
+      "clip": "today",
+      "say": "Pocket Garden cho cả nhà biết hôm nay cây nào cần chăm, trong một danh sách chung.",
+      "big": "Một danh sách,\n*cả nhà* cùng thấy",
+      "chips": [{ "text": "Chia sẻ với bạn cùng phòng" }]
+    },
+    {
+      "type": "phone",
+      "clip": "scan",
+      "say": "Chưa biết cây cần gì? Chụp một tấm ảnh, có ngay cách chăm trong vài giây.",
+      "big": "Chụp một tấm,\n*biết ngay*",
+      "zoom": { "s": 1.35, "x": 0.5, "y": 0.76, "at": 1.4 },
+      "chips": [{ "text": "Nhận diện cây" }]
+    },
+    {
+      "type": "phone",
+      "clip": "reminders",
+      "say": "Lời nhắc đến đúng lúc đất vừa khô.",
+      "big": "Nhắc tưới\n*đúng lúc*"
+    },
+    {
+      "type": "phone",
+      "clip": "streak",
+      "say": "Giữ chuỗi ngày chăm cây và ngắm khu vườn nhỏ lớn lên mỗi ngày.",
+      "big": "Chuỗi ngày\n*xanh mướt*",
+      "chips": [{ "text": "21 ngày liên tiếp" }]
+    },
+    {
+      "type": "trio",
+      "say": "Lịch tưới, nhận diện cây và mẹo chăm mỗi ngày, gói gọn trong một app.",
+      "big": "Đủ cả,\n*trong một app*"
+    },
+    {
+      "type": "end",
+      "say": "Tải Pocket Garden ngay hôm nay, cho cây nhà mình thêm xanh!",
+      "tag": "Cây vui, nhà vui",
+      "cta": "Tải Pocket Garden",
+      "confetti": 0.5,
+      "hold": 1.0
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "name": "app-promo-video",
+  "version": "1.0.0",
+  "description": "Code-driven promo videos for apps and products: still screenshots + a JSON script → voiced, captioned, scored ads in 9:16, 1:1, 16:9 and 4:5.",
+  "type": "module",
+  "license": "MIT",
+  "bin": {
+    "promo-video": "engine/cli.mjs"
+  },
+  "files": [
+    "engine",
+    "fonts",
+    "schema",
+    "examples",
+    "SKILL.md",
+    "AGENTS.md"
+  ],
+  "engines": {
+    "node": ">=18.17"
+  },
+  "scripts": {
+    "doctor": "node engine/cli.mjs doctor",
+    "check": "node engine/cli.mjs check",
+    "stills": "node engine/cli.mjs stills",
+    "build": "node engine/cli.mjs build",
+    "judge": "node engine/cli.mjs judge",
+    "voices": "node engine/cli.mjs voices",
+    "sheet": "node engine/cli.mjs sheet",
+    "new": "node engine/cli.mjs new",
+    "demo": "node engine/cli.mjs build examples/starter/scripts/launch-en.json --no-voice",
+    "mocks": "node tools/make-mocks.mjs"
+  },
+  "keywords": [
+    "video",
+    "ads",
+    "promo",
+    "app-store",
+    "tiktok",
+    "reels",
+    "text-to-speech",
+    "puppeteer",
+    "ffmpeg",
+    "agent-skill"
+  ],
+  "dependencies": {
+    "puppeteer-core": "^25.10.0"
+  },
+  "author": "Võ Chí Khanh <https://github.com/vochikhanh> (CTAS, https://ctas.vn)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vochikhanh/app-promo-video.git"
+  },
+  "homepage": "https://github.com/vochikhanh/app-promo-video#readme"
+}

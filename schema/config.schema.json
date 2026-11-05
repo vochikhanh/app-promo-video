@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/vochikhanh/app-promo-video/schema/config.schema.json",
+  "title": "Promo video project config (ads.json)",
+  "description": "Brand, voice, colors and per-language settings shared by every script in a project. Full reference: docs/script-format.md#adsjson",
+  "type": "object",
+  "required": ["appName", "themes", "lang"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "appName": { "type": "string", "description": "Shown in the corner and on the end card." },
+    "url": { "type": "string", "description": "Shown under the end-card buttons." },
+    "icon": { "type": "string", "description": "App icon path relative to the project (SVG, PNG or JPG, square)." },
+    "badges": { "type": "array", "items": { "type": "string" }, "default": ["App Store", "Google Play"], "description": "Store pills on the end card. [] hides them." },
+    "defaultLang": { "type": "string", "description": "Used when a script has no \"lang\"." },
+    "aspects": {
+      "type": "array",
+      "items": { "enum": ["9x16", "1x1", "16x9", "4x5"] },
+      "default": ["9x16", "1x1", "16x9"],
+      "description": "Aspect ratios rendered by default (override with --aspects)."
+    },
+    "speed": { "type": "number", "default": 1, "description": "Voice tempo (1.05 = 5% faster, pitch preserved)." },
+    "tail": { "type": "number", "default": 0.2, "description": "Seconds after each spoken line before the cut." },
+    "musicVolume": { "type": "number", "default": 0.22, "description": "Music level before ducking (0-1)." },
+    "readingSpeed": { "type": "number", "default": 15, "description": "Characters per second used to time scenes when there is no voice." },
+    "fonts": {
+      "type": "array",
+      "description": "Extra fonts stacked before Be Vietnam Pro (e.g. Noto Sans JP for Japanese).",
+      "items": { "type": "object", "required": ["family", "src"], "properties": { "family": { "type": "string" }, "src": { "type": "string" }, "weight": { "type": "number" } } }
+    },
+    "voice": {
+      "type": "object",
+      "description": "Voice-over settings. See docs/voice.md.",
+      "properties": {
+        "provider": { "type": "string", "default": "gemini", "description": "\"gemini\", \"none\", \"command\", or a path to a .mjs module (relative to the project)." },
+        "model": { "type": "string", "description": "Gemini TTS model, e.g. gemini-3.1-flash-tts-preview." },
+        "voice": { "type": "string", "description": "Prebuilt voice name (Gemini: Leda, Puck, Kore, Charon, Aoede, …)." },
+        "director": {
+          "oneOf": [{ "type": "string" }, { "type": "array", "items": { "type": "string" } }],
+          "description": "Director profile prepended to the transcript: who speaks, where, style, pace, accent. {LANG} becomes the language's accent."
+        },
+        "verify": { "type": "boolean", "default": true, "description": "Gemini: transcribe each cut to check it." },
+        "checkModel": { "type": "string", "description": "Gemini model used for the transcription check." },
+        "moods": { "type": "boolean", "default": false, "description": "Add a mood tag per scene type. Off by default: it tends to sound jumpy." },
+        "command": { "type": "array", "items": { "type": "string" }, "description": "provider \"command\": argv with {text} {textFile} {out} {lang} placeholders (no shell)." },
+        "stdin": { "type": "boolean", "description": "provider \"command\": pipe the text to stdin." },
+        "ext": { "type": "string", "description": "File extension the command/module writes (default wav)." }
+      },
+      "additionalProperties": true
+    },
+    "themes": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "required": ["c1", "c2"],
+        "properties": {
+          "c1": { "type": "string" }, "c2": { "type": "string" }, "glow": { "type": "string" }, "hl": { "type": "string" }
+        }
+      }
+    },
+    "lang": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "accent": { "type": "string", "description": "Replaces {LANG} in the director profile, e.g. \"American English\", \"Vietnamese\"." },
+          "chunk": { "type": "integer", "default": 4, "description": "Max words per caption phrase." },
+          "lexicon": { "type": "object", "additionalProperties": { "type": "string" }, "description": "How to SAY a word (captions keep the written form)." },
+          "voice": { "type": "object", "description": "Per-language overrides of the voice block (e.g. a different voice)." },
+          "features": {
+            "type": "array",
+            "description": "Default tiles for the trio scene.",
+            "items": { "type": "object", "required": ["name"], "properties": { "name": { "type": "string" }, "desc": { "type": "string" }, "color": { "type": "string" }, "icon": { "type": "string" } } }
+          }
+        }
+      }
+    }
+  }
+}

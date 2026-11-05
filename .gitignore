@@ -1,0 +1,25 @@
+node_modules
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Build outputs and caches (re-created by the engine)
+out/
+.cache/
+**/out/
+**/.cache/
+
+# Heavy media: never commit renders. The README demo clip is the one exception.
+*.mp4
+*.mov
+*.webm
+*.m4a
+*.wav
+!media/*.mp4
+
+.DS_Store
+Thumbs.db
+*.log
+__pycache__/
